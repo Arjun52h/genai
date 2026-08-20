@@ -1,0 +1,766 @@
+.interview-page {
+  width: 100%;
+  height: 100vh;
+
+  display: grid;
+
+  grid-template-columns: 250px 1fr 280px;
+
+  background: #111111;
+
+  color: #eeeeee;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  * {
+    box-sizing: border-box;
+  }
+
+
+  /* =====================================================
+     LEFT SIDEBAR
+     ===================================================== */
+
+  .interview-sidebar {
+    height: 100vh;
+
+    padding: 32px 18px;
+
+    border-right: 1px solid #302e2e;
+
+    background: #161414;
+  }
+
+
+  .sidebar-title {
+    padding: 0 14px;
+
+    margin-bottom: 15px;
+
+    color: #918b8b;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.2px;
+  }
+
+
+  .sidebar-item {
+    width: 100%;
+
+    height: 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 14px;
+
+    margin-bottom: 7px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #aaa4a4;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+  }
+
+
+  .sidebar-item:hover {
+    background: #211f1f;
+
+    color: #eeeeee;
+  }
+
+
+  .sidebar-item.active {
+    background: #351e28;
+
+    color: #ff6d91;
+
+    box-shadow:
+      inset 0 0 20px rgba(255, 90, 130, 0.05);
+  }
+
+
+  .sidebar-icon {
+    width: 20px;
+
+    color: #8d8585;
+
+    font-size: 17px;
+
+    text-align: center;
+  }
+
+
+  .sidebar-item.active .sidebar-icon {
+    color: #ff6d91;
+  }
+
+
+  /* =====================================================
+     CENTER CONTENT
+     ===================================================== */
+
+  .interview-content {
+    height: 100vh;
+
+    padding: 32px 36px;
+
+    overflow-y: auto;
+
+    min-width: 0;
+  }
+
+
+  /* =====================================================
+     CONTENT HEADER
+     ===================================================== */
+
+  .content-header {
+    width: 100%;
+
+    padding-bottom: 18px;
+
+    margin-bottom: 10px;
+
+    border-bottom: 1px solid #302e2e;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+  }
+
+
+  .content-header > div {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+  }
+
+
+  .content-header h1 {
+    margin: 0;
+
+    color: #eeeeee;
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    letter-spacing: -0.4px;
+  }
+
+
+  .question-count {
+    padding: 6px 13px;
+
+    border: 1px solid #383535;
+
+    border-radius: 20px;
+
+    background: #211f1f;
+
+    color: #a8a1a1;
+
+    font-size: 12px;
+  }
+
+
+  /* =====================================================
+     QUESTIONS
+     ===================================================== */
+
+  .questions-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 13px;
+
+    padding-top: 8px;
+  }
+
+
+  .question-card {
+    width: 100%;
+
+    overflow: hidden;
+
+    border: 1px solid #383636;
+
+    border-radius: 12px;
+
+    background: #1d1b1b;
+
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease;
+  }
+
+
+  .question-card:hover {
+    border-color: #494444;
+
+    background: #201e1e;
+  }
+
+
+  .question-card.open {
+    border-color: #62464b;
+  }
+
+
+  .question-button {
+    width: 100%;
+
+    min-height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 10px 16px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #eeeeee;
+
+    font-family: inherit;
+
+    text-align: left;
+
+    cursor: pointer;
+  }
+
+
+  /* =====================================================
+     QUESTION NUMBER
+     ===================================================== */
+
+  .question-number {
+    min-width: 34px;
+
+    height: 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 5px;
+
+    background: #451b30;
+
+    color: #ff4f8a;
+
+    font-size: 11px;
+
+    font-weight: 700;
+  }
+
+
+  /* =====================================================
+     QUESTION TEXT
+     ===================================================== */
+
+  .question-text {
+    flex: 1;
+
+    color: #e7e4e4;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    line-height: 1.45;
+  }
+
+
+  /* =====================================================
+     QUESTION ARROW
+     ===================================================== */
+
+  .question-arrow {
+    width: 20px;
+
+    color: #8f8989;
+
+    font-size: 19px;
+
+    text-align: center;
+
+    transition: transform 0.2s ease;
+  }
+
+
+  .question-arrow.rotated {
+    transform: rotate(180deg);
+  }
+
+
+  /* =====================================================
+     QUESTION ANSWER / EXPANDED
+     ===================================================== */
+
+  .question-answer {
+    padding: 0 18px 18px 63px;
+
+    border-top: 1px solid #302e2e;
+  }
+
+
+  .answer-label {
+    margin-top: 15px;
+
+    color: #ffaaa8;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+  }
+
+
+  .question-answer p {
+    margin: 8px 0 0;
+
+    color: #aaa4a4;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+  }
+
+
+  /* =====================================================
+     ROADMAP
+     ===================================================== */
+
+  .roadmap-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    padding-top: 8px;
+  }
+
+
+  .roadmap-card {
+    display: flex;
+
+    gap: 15px;
+
+    padding: 17px;
+
+    border: 1px solid #383636;
+
+    border-radius: 12px;
+
+    background: #1d1b1b;
+
+    transition: 0.2s ease;
+  }
+
+
+  .roadmap-card:hover {
+    border-color: #554343;
+
+    background: #201e1e;
+  }
+
+
+  .day-badge {
+    min-width: 52px;
+
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: #451b30;
+
+    color: #ff8eac;
+
+    font-size: 11px;
+
+    font-weight: 700;
+  }
+
+
+  .roadmap-content {
+    min-width: 0;
+  }
+
+
+  .roadmap-content h3 {
+    margin: 0 0 7px;
+
+    color: #eeeeee;
+
+    font-size: 14px;
+
+    font-weight: 600;
+  }
+
+
+  .roadmap-content p {
+    margin: 0;
+
+    color: #aaa4a4;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+  }
+
+
+  /* =====================================================
+     RIGHT SIDEBAR
+     ===================================================== */
+
+  .score-sidebar {
+    height: 100vh;
+
+    padding: 32px 24px;
+
+    border-left: 1px solid #302e2e;
+
+    background: #161414;
+
+    overflow-y: auto;
+  }
+
+
+  .score-title {
+    color: #918b8b;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.2px;
+  }
+
+
+  /* =====================================================
+     MATCH SCORE CIRCLE
+     ===================================================== */
+
+  .score-circle {
+    width: 105px;
+
+    height: 105px;
+
+    margin: 12px auto 13px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 4px solid #4cc765;
+
+    border-radius: 50%;
+
+    background: #161414;
+
+    box-shadow:
+      0 0 20px rgba(76, 199, 101, 0.08);
+  }
+
+
+  .score-value {
+    margin-top: 3px;
+
+    color: #eeeeee;
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+    line-height: 1;
+  }
+
+
+  .score-percent {
+    margin-top: 3px;
+
+    color: #aaa4a4;
+
+    font-size: 11px;
+  }
+
+
+  .score-message {
+    margin-bottom: 22px;
+
+    color: #54c96c;
+
+    font-size: 13px;
+
+    text-align: center;
+  }
+
+
+  /* =====================================================
+     SUMMARY
+     ===================================================== */
+
+  .summary-section {
+    padding-top: 18px;
+
+    border-top: 1px solid #302e2e;
+  }
+
+
+  .summary-title,
+  .skill-title {
+    margin-bottom: 10px;
+
+    color: #918b8b;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+  }
+
+
+  .summary-section p {
+    margin: 0;
+
+    color: #aaa4a4;
+
+    font-size: 11px;
+
+    line-height: 1.6;
+  }
+
+
+  /* =====================================================
+     SKILL GAPS
+     ===================================================== */
+
+  .skill-section {
+    margin-top: 22px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #302e2e;
+  }
+
+
+  .skill-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+
+  .skill-tag {
+    padding: 10px 12px;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+  }
+
+
+  /* RED */
+
+  .skill-0 {
+    border: 1px solid #603538;
+
+    background: #321f21;
+
+    color: #ff7777;
+  }
+
+
+  /* ORANGE */
+
+  .skill-1 {
+    border: 1px solid #625137;
+
+    background: #302a20;
+
+    color: #e8a63d;
+  }
+
+
+  /* GREEN */
+
+  .skill-2 {
+    border: 1px solid #36563f;
+
+    background: #1e3025;
+
+    color: #55c875;
+  }
+
+
+  /* =====================================================
+     SCROLLBAR
+     ===================================================== */
+
+  .interview-content::-webkit-scrollbar,
+  .score-sidebar::-webkit-scrollbar {
+    width: 5px;
+  }
+
+
+  .interview-content::-webkit-scrollbar-track,
+  .score-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+
+  .interview-content::-webkit-scrollbar-thumb,
+  .score-sidebar::-webkit-scrollbar-thumb {
+    background: #383333;
+
+    border-radius: 10px;
+  }
+
+
+  /* =====================================================
+     RESPONSIVE
+     ===================================================== */
+
+  @media (max-width: 1000px) {
+
+    grid-template-columns:
+      210px
+      1fr
+      230px;
+
+
+    .interview-content {
+      padding: 28px 22px;
+    }
+
+
+    .score-sidebar {
+      padding: 28px 18px;
+    }
+
+
+    .question-text {
+      font-size: 13px;
+    }
+  }
+
+
+  @media (max-width: 750px) {
+
+    height: auto;
+
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+
+    .interview-sidebar {
+      width: 100%;
+
+      height: auto;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 5px;
+
+      padding: 12px;
+
+      border-right: none;
+
+      border-bottom: 1px solid #302e2e;
+
+      overflow-x: auto;
+    }
+
+
+    .sidebar-title {
+      display: none;
+    }
+
+
+    .sidebar-item {
+      width: auto;
+
+      margin: 0;
+
+      white-space: nowrap;
+    }
+
+
+    .interview-content {
+      width: 100%;
+
+      height: auto;
+
+      min-height: 500px;
+    }
+
+
+    .score-sidebar {
+      width: 100%;
+
+      height: auto;
+
+      border-left: none;
+
+      border-top: 1px solid #302e2e;
+    }
+  }
+}

@@ -1,0 +1,57 @@
+import axios from "axios";
+
+
+const api = axios.create({
+    baseURL: "http://localhost:3000/api",
+   withCredentials: true
+})
+
+
+export async function register({ username, email, password }){
+   
+   try{
+    const response = await api.post("/auth/register", { username, email, password })
+    return response.data;
+    }
+    catch (error) {
+        console.error("Error during registration:", error);
+        throw error;
+      }
+    
+} 
+
+export async function Login({ email, password }) {
+    try {
+        const response = await api.post("/auth/login", {
+            email,
+            password
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error during login:", error);
+        throw error;
+    }
+}
+
+
+export async function Logout() {
+    try{
+        const response = await api.get("/auth/logout");
+        return response.data;
+    }
+    catch (error) {
+        console.error("Error during logout:", error);
+        throw error;
+    }
+}
+export async function getMe() {
+    try{
+        const response = await api.get("/auth/get_me");
+        return response.data;
+    }
+    catch (error) {
+        console.error("Error during fetching user info:", error);
+        throw error;
+    }
+}

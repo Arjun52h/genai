@@ -1,0 +1,540 @@
+.home {
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #111111;
+
+  color: #eeeeee;
+
+  box-sizing: border-box;
+
+  * {
+    box-sizing: border-box;
+  }
+
+
+  /* ==========================================
+     MAIN LAYOUT
+     ========================================== */
+
+  .interview_group {
+    width: 700px;
+    height: 520px;
+
+    display: flex;
+
+    gap: 34px;
+
+    margin: 0 auto;
+  }
+
+
+  /* ==========================================
+     COMMON HEADER
+     ========================================== */
+
+  .card-header {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    flex-shrink: 0;
+  }
+
+  .header-icon {
+    width: 27px;
+    height: 27px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffaaa8;
+
+    flex-shrink: 0;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+
+  /* ==========================================
+     LEFT CARD
+     ========================================== */
+
+  .left {
+    width: 50%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 20px;
+
+    background: #1d1b1b;
+
+    border: 1px solid #302e2e;
+
+    border-radius: 20px;
+
+    box-shadow:
+      0 15px 35px rgba(0, 0, 0, 0.18);
+  }
+
+
+  .left label {
+    color: #eeeeee;
+
+    font-size: 17px;
+
+    font-weight: 600;
+  }
+
+
+  /* ==========================================
+     JOB DESCRIPTION
+     ========================================== */
+
+  .job-description-box {
+    width: 100%;
+
+    flex: 1;
+
+    min-height: 0;
+
+    margin-top: 22px;
+  }
+
+
+  .job-description-box textarea {
+    width: 100%;
+    height: 100%;
+
+    padding: 18px;
+
+    resize: none;
+
+    outline: none;
+
+    border: 1px solid #393636;
+
+    border-radius: 14px;
+
+    background: #211f1f;
+
+    color: #eeeeee;
+
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    transition: 0.2s ease;
+  }
+
+
+  .job-description-box textarea::placeholder {
+    color: #d0caca;
+  }
+
+//   .upload-error {
+//     color: #ff8f8f !important;
+//     font-size: 12px !important;
+//     margin-top: 5px;
+//     }
+  .job-description-box textarea:focus {
+    border-color: #655151;
+
+    background: #232121;
+  }
+
+
+  /* ==========================================
+     RIGHT SIDE
+     ========================================== */
+
+  .right {
+    width: 50%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+  }
+
+
+  /* ==========================================
+     RESUME CARD
+     ========================================== */
+
+  .resume-card {
+    width: 100%;
+
+    height: 230px;
+
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #1d1b1b;
+
+    border: 1px solid #302e2e;
+
+    border-radius: 20px;
+
+    box-shadow:
+      0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+
+
+  .resume-header span {
+    color: #eeeeee;
+
+    font-size: 17px;
+
+    font-weight: 600;
+  }
+
+
+  /* ==========================================
+     REQUIRED BADGE
+     ========================================== */
+
+  .required {
+    margin-left: auto;
+
+    padding: 5px 13px;
+
+    min-width: 125px;
+
+    border-radius: 20px;
+
+    border: 1px solid #3a3737;
+
+    background: #292727;
+
+    color: #aaa4a4;
+
+    font-size: 9px;
+
+    font-weight: 600;
+
+    line-height: 1.1;
+
+    letter-spacing: 0.3px;
+  }
+
+
+  /* ==========================================
+     UPLOAD BOX
+     ========================================== */
+
+  .upload-box {
+    width: 100%;
+
+    flex: 1;
+
+    min-height: 0;
+
+    margin-top: 16px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border: 2px dashed #694c4c;
+
+    border-radius: 14px;
+
+    background: #211f1f;
+
+    cursor: pointer;
+
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+
+  .upload-box:hover {
+    background: #252222;
+
+    border-color: #936969;
+  }
+
+
+  .upload-box strong {
+    color: #e6dede;
+
+    font-size: 13px;
+
+    font-weight: 600;
+  }
+
+
+  .upload-box span {
+    color: #c3b8b8;
+
+    font-size: 12px;
+  }
+
+
+  /* ==========================================
+     UPLOAD ICON
+     ========================================== */
+
+  .upload-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    margin-bottom: 5px;
+
+    border-radius: 50%;
+
+    background: #373535;
+
+    color: #ffd1cf;
+  }
+
+
+  .upload-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+
+  /* ==========================================
+     SELF DESCRIPTION CARD
+     ========================================== */
+
+  .self-card {
+    width: 100%;
+
+    height: 180px;
+
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #1d1b1b;
+
+    border: 1px solid #302e2e;
+
+    border-radius: 20px;
+
+    box-shadow:
+      0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+
+
+  .self-card label {
+    color: #eeeeee;
+
+    font-size: 17px;
+
+    font-weight: 600;
+  }
+
+
+  .self-card textarea {
+    width: 100%;
+
+    flex: 1;
+
+    min-height: 0;
+
+    margin-top: 16px;
+
+    padding: 15px;
+
+    resize: none;
+
+    outline: none;
+
+    border: 1px solid #393636;
+
+    border-radius: 13px;
+
+    background: #211f1f;
+
+    color: #eeeeee;
+
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+  }
+
+
+  .self-card textarea::placeholder {
+    color: #d0caca;
+  }
+
+
+  .self-card textarea:focus {
+    border-color: #655151;
+
+    background: #232121;
+  }
+
+
+  /* ==========================================
+     GENERATE BUTTON
+     ========================================== */
+
+  .primary_button {
+    width: 100%;
+
+    height: 48px;
+
+    flex-shrink: 0;
+
+    border: none;
+
+    outline: none;
+
+    border-radius: 13px;
+
+    background: #ffaaa8;
+
+    color: #641a1d;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+  }
+
+
+  .primary_button:hover {
+    background: #ffb8b6;
+
+    transform: translateY(-1px);
+  }
+
+
+  .primary_button:active {
+    transform: translateY(0);
+  }
+
+
+  .sparkle {
+    font-size: 19px;
+
+    color: #711e24;
+
+    line-height: 1;
+  }
+
+
+  /* ==========================================
+     RESPONSIVE
+     ========================================== */
+
+  @media (max-width: 800px) {
+    .interview_group {
+      width: 90%;
+    }
+  }
+
+
+  @media (max-width: 600px) {
+    height: auto;
+
+    min-height: 100vh;
+
+    padding: 30px 20px;
+
+    align-items: flex-start;
+
+
+    .interview_group {
+      width: 100%;
+
+      height: auto;
+
+      flex-direction: column;
+
+      gap: 18px;
+    }
+
+
+    .left,
+    .right {
+      width: 100%;
+    }
+
+
+    .left {
+      height: 450px;
+    }
+
+
+    .right {
+      height: auto;
+    }
+
+
+    .resume-card {
+      height: 240px;
+    }
+
+
+    .self-card {
+      height: 250px;
+    }
+  }
+}
