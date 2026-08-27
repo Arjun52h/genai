@@ -38,7 +38,12 @@ async function registerUser(req,res){
 
         )
 
-        res.cookie("token" , token )
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 24 * 60 * 60 * 1000
+        });
 
         res.status(201).json({
             message : "user created successfully",
@@ -62,14 +67,18 @@ async function loginUser(req,res){
 
     const user = await userModel.findOne({email : email})
 
-    if(!user){
-        res.status(400).json({error : "user not found "})
-    }
+    if (!user) {
+    return res.status(400).json({
+        error: "user not found"
+    });
+}
 
     const isPassword = await bcrypt.compare(password , user.password)
-    if(!isPassword){
-        res.status(400).json({error : "invalid credentials"})
-    }
+    if (!isPassword) {
+    return res.status(400).json({
+        error: "invalid credentials"
+    });
+}
 
     const token = jwt.sign(
             {id : user._id,username : user.username },
@@ -78,7 +87,12 @@ async function loginUser(req,res){
 
         )
 
-        res.cookie("token" , token)
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 24 * 60 * 60 * 1000
+        });
 
         res.status(200).json({
             message : "user logged in successfully",
@@ -96,7 +110,11 @@ async function logoutUser(req,res){ // logout controller function to clear the t
         await blacklistModel.create({ token})
     }
     
-    res.clearCookie("token")
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none"
+    });
     res.status(200).json({message : "user logged out successfully"})
 }
 
