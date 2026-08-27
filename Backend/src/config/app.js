@@ -8,7 +8,7 @@ app.use(cookieParser()) // middleware , allow to parse cookie from request heade
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://genai-nine-chi.vercel.app/"
+        "https://genai-nine-chi.vercel.app"
     ],
     credentials: true
 }));
