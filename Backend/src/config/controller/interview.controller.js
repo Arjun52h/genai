@@ -2,10 +2,7 @@ const { PDFParse } = require("pdf-parse");
 const generateInterviewReport = require("../services/ai.service")
 const interviewReportModel = require("../models/interviewmodel_report")
 async function generateInterviewReportController(req,res){ 
-    console.log("🔥 CONTROLLER HIT");
-
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
+   
 
     try {
         if(!req.file) {
@@ -18,6 +15,9 @@ async function generateInterviewReportController(req,res){
             selfDescription,
             jobDescription
         }) 
+
+        console.log("🔥 REPORT BEFORE MONGODB:");
+        console.log(JSON.stringify(interviewReportbyai, null, 2));
         const interviewReport = await interviewReportModel.create({
             user : req.user._id,
             resume:resumeContent.text,

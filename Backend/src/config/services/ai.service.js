@@ -152,7 +152,7 @@ Return ONLY valid JSON matching the schema.
         contents:prompt,
         config:{
             responseMimeType:"application/json",
-            responseJsonSchema:zodToJsonSchema(interviewReportSchema),
+            // responseJsonSchema:zodToJsonSchema(interviewReportSchema),
             
         }
          })
@@ -165,7 +165,9 @@ Return ONLY valid JSON matching the schema.
         console.log("🔥🔥 ACTUAL GEMINI JSON 🔥🔥");
         console.log(JSON.stringify(interviewReport, null, 2));
 
-        return interviewReport;
+        const validatedReport = interviewReportSchema.parse(interviewReport);
+
+        return validatedReport;
       
      
  }

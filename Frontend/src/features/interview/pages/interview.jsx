@@ -103,15 +103,15 @@ const Interview = () => {
     // =====================================
 
     const technicalQuestions =
-        report.technicalquestion || [];
+    (report.technicalquestion || []).filter(Boolean);
 
 
     // =====================================
     // BEHAVIOURAL QUESTIONS
     // =====================================
 
-    const behaviouralQuestions =
-        report.behaviouralquestion || [];
+   const behaviouralQuestions =
+    (report.behaviouralquestion || []).filter(Boolean);
 
 
     // =====================================
@@ -119,7 +119,7 @@ const Interview = () => {
     // =====================================
 
     const skillGaps =
-        report.skillGaps || [];
+    (report.skillGaps || []).filter(Boolean);
 
 
     // =====================================
@@ -127,7 +127,7 @@ const Interview = () => {
     // =====================================
 
     const preparationPlan =
-        report.preparationPlan || [];
+    (report.preparationPlan || []).filter(Boolean);
 
 
     return (
