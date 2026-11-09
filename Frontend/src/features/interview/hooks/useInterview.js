@@ -14,25 +14,33 @@ export const useInterview = () =>{
 
     const {loading , setloading ,report , setreport , reportlist , setreportlist} = context
 
-const generateReport = async ({ jobDescription, selfDescription, resumefile }) => {
-  setloading(true);
-  
-  try {
-    const response = await generateinterviewReport({ jobDescription, selfDescription, resumefile });
+const generateReport = async ({
+    jobDescription,
+    selfDescription,
+    resumefile
+}) => {
+    setloading(true);
 
-    if (response && response.interviewReport) {
-      setreport(response.interviewReport);
-      return response.interviewReport;
-    } else {
-      console.error("No interviewReport in response:", response);
-      return null;
+    try {
+        const response = await generateinterviewReport({
+            jobDescription,
+            selfDescription,
+            resumefile
+        });
+
+        if (response?.interviewReport) {
+            setreport(response.interviewReport);
+        }
+
+        return response;
+
+    } catch (error) {
+        console.error("Error generating report:", error);
+        throw error;
+
+    } finally {
+        setloading(false);
     }
-  } catch (error) {
-    console.error("Error generating report:", error);
-    return null;
-  } finally {
-    setloading(false);
-  }
 };
 
 

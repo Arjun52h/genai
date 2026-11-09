@@ -1,42 +1,46 @@
-import {createContext ,useState  , useEffect} from 'react';
-import { getMe } from './services/auth.api';
+import { createContext, useState, useEffect } from "react";
+import { getMe, Logout } from "./services/auth.api";
+
 export const AuthContext = createContext();
 
-
-export const AuthProvider = ({children}) => {
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        const getandset = async() =>{
+    useEffect(() => {
+        const getandset = async () => {
             try {
-                const data = await getMe()
-                setUser(data.user)
-                
+                const data = await getMe();
+                setUser(data.user);
             } catch (error) {
-                console.log("Error at the auth.context.js");
-                
+                console.log("Error at the auth.context.js:", error);
+            } finally {
+                setLoading(false);
             }
-            finally{
-                setLoading(false)
-            }
-        }
-        getandset()
-    },[])
+        };
 
-    // useEffect(()=>{
-    //     const getandsetdata = async()=>{
-    //         const data = await getMe()
-    //         setUser(data.user)
-    //         setLoading(false)
-    //     }
-    //     getandsetdata()
-    // })
+        getandset();
+    }, []);
+
+    const logout = async () => {
+        try {
+            await Logout();
+        } finally {
+            setUser(null);
+        }
+    };
 
     return (
-        <AuthContext.Provider value={{user, setUser, loading, setLoading}}>
+        <AuthContext.Provider
+            value={{
+                user,
+                setUser,
+                loading,
+                setLoading,
+                logout
+            }}
+        >
             {children}
         </AuthContext.Provider>
-    )
-}
- 
+    );
+};

@@ -113,7 +113,8 @@ async function logoutUser(req,res){ // logout controller function to clear the t
     res.clearCookie("token", {
         httpOnly: true,
         secure: true,
-        sameSite: "none"
+        sameSite: "none",
+        path: "/"
     });
     res.status(200).json({message : "user logged out successfully"})
 }

@@ -1,1 +1,18 @@
-.env
+# Node dependencies
+**/node_modules/
+
+# Python virtual environment
+ML/venv/
+ML/.venv/
+
+# Python cache
+**/__pycache__/
+*.pyc
+
+# Environment variables
+**/.env
+**/.env.*
+!.env.example
+
+# Build files
+**/dist/

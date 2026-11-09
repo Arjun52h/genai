@@ -10,7 +10,7 @@ export const generateinterviewReport = async ({
     jobDescription,
     selfDescription,
     resumefile
-}) => {
+ }) => {
     try {
         const formData = new FormData();
 
@@ -32,11 +32,19 @@ export const generateinterviewReport = async ({
 
         return response.data;
 
-    } catch (error) {
-        console.log("STATUS:", error.response?.status);
-        console.log("BACKEND ERROR:", error.response?.data);
-        throw error;
+    }catch (error) {
+    console.log("STATUS:", error.response?.status);
+    console.log("BACKEND ERROR:", error.response?.data);
+
+    if (
+        error.response?.status === 429 &&
+        error.response?.data?.isDemo
+    ) {
+        return error.response.data;
     }
+
+    throw error;
+}
 };
 
 

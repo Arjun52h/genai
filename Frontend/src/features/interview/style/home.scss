@@ -1,3 +1,168 @@
+
+/* ==========================================
+   HOME PAGE ALIGNMENT FIX
+========================================== */
+
+.home {
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    padding: 25px 30px 40px;
+}
+
+/* TOP NAVIGATION / LOGOUT */
+
+.home-topbar {
+    width: 100%;
+    max-width: 1040px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin: 0 auto 28px;
+    padding: 0 0 18px;
+
+    border-bottom: 1px solid #302e2e;
+
+    color: #eeeeee;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.logout-button {
+    padding: 9px 20px;
+
+    border: 1px solid #ffaaa8;
+    border-radius: 8px;
+
+    background: transparent;
+    color: #ffaaa8;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #ffaaa8;
+        color: #641a1d;
+    }
+}
+
+/* MAIN INTERVIEW FORM */
+
+.home .interview_group {
+    width: 100%;
+    max-width: 1040px;
+
+    height: auto;
+    min-height: 520px;
+
+    display: flex;
+    align-items: stretch;
+
+    gap: 24px;
+    margin: 0 auto;
+}
+
+/* LEFT AND RIGHT COLUMNS */
+
+.home .left,
+.home .right {
+    width: 50%;
+    min-width: 0;
+}
+
+.home .left {
+    min-height: 520px;
+}
+
+.home .right {
+    height: auto;
+}
+
+/* CARD ALIGNMENT */
+
+.home .resume-card {
+    height: 230px;
+}
+
+.home .self-card {
+    height: 180px;
+}
+
+/* GENERATE BUTTON */
+
+.home .primary_button {
+    height: 50px;
+    border-radius: 10px;
+}
+
+/* TABLET */
+
+@media (max-width: 800px) {
+    .home {
+        padding: 20px;
+    }
+
+    .home .interview_group {
+        gap: 16px;
+    }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    .home {
+        padding: 18px 14px 30px;
+    }
+
+    .home-topbar {
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+    }
+
+    .home .interview_group {
+        flex-direction: column;
+        min-height: auto;
+        gap: 18px;
+    }
+
+    .home .left,
+    .home .right {
+        width: 100%;
+    }
+
+    .home .left {
+        min-height: 350px;
+    }
+
+    .home .right {
+        gap: 16px;
+    }
+
+    .home .resume-card {
+        height: 230px;
+    }
+
+    .home .self-card {
+        height: 200px;
+    }
+
+    .home-topbar {
+        font-size: 13px;
+    }
+}
+
+
 .home {
   width: 100%;
   height: 100vh;
@@ -537,4 +702,28 @@
       height: 250px;
     }
   }
+}
+
+.home-topbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 30px;
+}
+
+.logout-button {
+    padding: 10px 22px;
+    border: 1px solid #dc2626;
+    border-radius: 8px;
+    background: transparent;
+    color: #dc2626;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+
+    &:hover {
+        background: #dc2626;
+        color: white;
+    }
 }

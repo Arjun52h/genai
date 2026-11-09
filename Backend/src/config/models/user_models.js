@@ -14,6 +14,14 @@ const UserSchema = new mongoose.Schema({
     password :{
         type : String,
         required : [true , "password is required"]
+    },
+    aiUsageDate: {
+    type: String,
+    default: null
+    },
+    aiUsageCount: {
+        type: Number,
+        default: 0
     }
 })
 const userModel = mongoose.model("Users" , UserSchema);

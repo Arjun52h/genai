@@ -1,12 +1,14 @@
-import React, {
+import {
+    Navigate,
+    useParams,
+    useLocation
+} from "react-router";
+import { React, 
     useState,
     useEffect
 } from "react";
 
-import {
-    Navigate,
-    useParams
-} from "react-router";
+
 
 import "../style/interview.scss";
 
@@ -16,12 +18,34 @@ import { useInterview } from "../hooks/useInterview.js";
 const Interview = () => {
 
     const { interviewId } = useParams();
-
+    const location = useLocation();
+    
     const {
         report,
         loading,
         generateReportById
     } = useInterview();
+
+const isDemo = interviewId === "demo";
+
+const demoReport =
+    location.state?.report ||
+    (() => {
+        try {
+            return JSON.parse(
+                sessionStorage.getItem("demoInterviewReport")
+            );
+        } catch {
+            return null;
+        }
+    })();
+
+const demoMessage =
+    location.state?.demoMessage ||
+    "Your daily AI generation limit has been reached. Please try again tomorrow.";
+
+const currentReport = isDemo ? demoReport : report;
+
 
 
     const [activeSection, setActiveSection] =
@@ -36,16 +60,10 @@ const Interview = () => {
     // =====================================
 
     useEffect(() => {
-
-        if (interviewId) {
-
-            generateReportById({
-                interviewId
-            });
-
-        }
-
-    }, [interviewId]);
+    if (interviewId && interviewId !== "demo") {
+        generateReportById({ interviewId });
+    }
+}, [interviewId]);
 
 
     // =====================================
@@ -71,7 +89,7 @@ const Interview = () => {
     // NO REPORT
     // =====================================
 
-    if (!report) {
+    if (!currentReport) {
 
         return (
             <Navigate
@@ -103,7 +121,7 @@ const Interview = () => {
     // =====================================
 
     const technicalQuestions =
-    (report.technicalquestion || []).filter(Boolean);
+    (currentReport.technicalquestion || []).filter(Boolean);
 
 
     // =====================================
@@ -111,7 +129,7 @@ const Interview = () => {
     // =====================================
 
    const behaviouralQuestions =
-    (report.behaviouralquestion || []).filter(Boolean);
+    (currentReport.behaviouralquestion || []).filter(Boolean);
 
 
     // =====================================
@@ -119,7 +137,7 @@ const Interview = () => {
     // =====================================
 
     const skillGaps =
-    (report.skillGaps || []).filter(Boolean);
+    (currentReport.skillGaps || []).filter(Boolean);
 
 
     // =====================================
@@ -127,12 +145,20 @@ const Interview = () => {
     // =====================================
 
     const preparationPlan =
-    (report.preparationPlan || []).filter(Boolean);
+    (currentReport.preparationPlan || []).filter(Boolean);
 
 
     return (
 
         <main className="interview-page">
+
+            {isDemo && (
+                <div className="demo-notice">
+                    <h3>Daily AI Limit Reached</h3>
+                    <p>{demoMessage}</p>
+                    <p>You are viewing a sample interview report.</p>
+                </div>
+            )}
 
 
             {/* =========================================
@@ -616,7 +642,7 @@ const Interview = () => {
 
                     <div className="score-value">
 
-                        {report.matchScore}
+                        {currentReport.matchScore}
 
                     </div>
 
@@ -631,11 +657,11 @@ const Interview = () => {
 
                 <div className="score-message">
 
-                    {report.matchScore >= 80
+                    {currentReport.matchScore >= 80
 
                         ? "Strong match for this role"
 
-                        : report.matchScore >= 60
+                        : currentReport.matchScore >= 60
 
                             ? "Good match for this role"
 
@@ -656,7 +682,7 @@ const Interview = () => {
                     </div>
 
                     <p>
-                        {report.title}
+                        {currentReport.title}
                     </p>
 
                 </div>

@@ -1,47 +1,201 @@
-const {GoogleGenAI} =require('@google/genai')
- const {z} = require("zod")
- const {zodToJsonSchema} = require("zod-to-json-schema")
 
- const ai = new GoogleGenAI({
-    apiKey : process.env.GOOGLE_GEN_ApI_KEY
- })
+require("dotenv").config();
+
+const Groq = require("groq-sdk");
+const { z } = require("zod");
+
+const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY
+});
+
+// ==========================================
+// 1. ZOD VALIDATION SCHEMA
+// ==========================================
+
+const questionSchema = z.object({
+    question: z.string().trim().min(1),
+    intention: z.string().trim().min(1),
+    answer: z.string().trim().min(1)
+}).strict();
+
+const skillGapSchema = z.object({
+    skill: z.string().trim().min(1),
+    severity: z.enum(["low", "medium", "high"])
+}).strict();
+
+const preparationDaySchema = z.object({
+    day: z.number().int().min(1).max(7),
+    focus: z.string().trim().min(1),
+    tasks: z.array(z.string().trim().min(1)).min(1)
+}).strict();
+
+const interviewReportSchema = z.object({
+    matchScore: z.number().min(0).max(100),
+
+    technicalquestion: z.array(questionSchema).length(3),
+
+    behaviouralquestion: z.array(questionSchema).length(2),
+
+    // Empty skill gaps are valid.
+    skillGaps: z.array(skillGapSchema),
+
+    preparationPlan: z.array(preparationDaySchema).length(7),
+
+    title: z.string().trim().min(1)
+}).strict();
 
 
- const interviewReportSchema = z.object({
-    matchScore:z.number().describe("give  A overall score   based on candidate resume and score between 0 to 100 indicating how well the candidate profile matches the job description"),
-    technicalquestion:z.array(z.object({
-        question:z.string().describe("The technical Question can be ask in Interview"),
-        intention:z.string().describe("The Intention of Interviwer behind asking the questions"),
-        answer:z.string().describe("How to answer this question wht points to cover ,what approach to take etc ")
-    })).describe("Technical question that can be asked in the interview along with their intention and how to answer them").min(1),
-    behaviouralquestion:z.array(z.object({
-        question:z.string().describe("The behavioural Question can be ask in Interview"),
-        intention:z.string().describe("The Intention of Interviwer behind asking the questions"),
-        answer:z.string().describe("How to answer this question wht points to cover ,what approach should be used ")
-    })).describe("Behavioural question that can be asked in the interview along with their intention and how to answer them").min(1),
-    skillGaps : z.array(z.object({
-        skill : z.string().describe("The skill which the candidate is lacking ") ,
-        severity: z.enum(["low", "medium","high"]).describe("The severity of skill gap i.e. ")
-    })).describe("List of skill gap in the candidate's profile along with their severity ").min(1),
-    preparationPlan: z.array(z.object({
-        day : z.number().describe("The sequential preparation day number, starting from 1"),
-        focus:z.string().describe("The main skill, topic, or interview area to focus on during this day "),
-        tasks: z.array(z.string()).describe(
-    "List of specific and actionable tasks the candidate should complete on this day"
-).min(1)
-    })).describe("A personalized day-wise preparation plan based on the candidate's resume, self-description, skill gaps, and job description").length(7),
-    title: z.string().describe("The title of the job   for which the interview  report is generated")
-    
- })
+// ==========================================
+// 2. GROQ STRUCTURED OUTPUT JSON SCHEMA
+// ==========================================
 
- async function generateInterviewReport({resume , selfDescription , jobDescription}){
-       const prompt = `
+const groqResponseSchema = {
+    type: "object",
+    properties: {
+        matchScore: {
+            type: "number"
+        },
+
+        technicalquestion: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    question: { type: "string" },
+                    intention: { type: "string" },
+                    answer: { type: "string" }
+                },
+                required: ["question", "intention", "answer"],
+                additionalProperties: false
+            }
+        },
+
+        behaviouralquestion: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    question: { type: "string" },
+                    intention: { type: "string" },
+                    answer: { type: "string" }
+                },
+                required: ["question", "intention", "answer"],
+                additionalProperties: false
+            }
+        },
+
+        skillGaps: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    skill: { type: "string" },
+                    severity: {
+                        type: "string",
+                        enum: ["low", "medium", "high"]
+                    }
+                },
+                required: ["skill", "severity"],
+                additionalProperties: false
+            }
+        },
+
+        preparationPlan: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    day: { type: "integer" },
+                    focus: { type: "string" },
+                    tasks: {
+                        type: "array",
+                        items: { type: "string" }
+                    }
+                },
+                required: ["day", "focus", "tasks"],
+                additionalProperties: false
+            }
+        },
+
+        title: {
+            type: "string"
+        }
+    },
+
+    required: [
+        "matchScore",
+        "technicalquestion",
+        "behaviouralquestion",
+        "skillGaps",
+        "preparationPlan",
+        "title"
+    ],
+
+    additionalProperties: false
+};
+
+
+// ==========================================
+// 3. GENERATE INTERVIEW REPORT
+// ==========================================
+
+async function generateInterviewReport({
+    resume,
+    selfDescription,
+    jobDescription,
+    mlAnalysis
+}) {
+
+    console.log("🔥 AI SERVICE CALLED");
+    console.log(
+        "Groq key loaded:",
+        process.env.GROQ_API_KEY ? "YES" : "NO"
+    );
+
+    if (!process.env.GROQ_API_KEY) {
+        throw new Error("GROQ_API_KEY is missing in environment variables.");
+    }
+
+    if (!jobDescription || !String(jobDescription).trim()) {
+        throw new Error("Job description is required.");
+    }
+
+    if (!resume || !String(resume).trim()) {
+        throw new Error("Resume content is required.");
+    }
+
+    // Use the ML-generated score without recalculating it.
+    const mlMatchScore = Number(mlAnalysis?.matchScore ?? 0);
+
+    if (
+        !Number.isFinite(mlMatchScore) ||
+        mlMatchScore < 0 ||
+        mlMatchScore > 100
+    ) {
+        throw new Error("Invalid match score received from ML service.");
+    }
+
+    const resumeForAI = String(resume).slice(0, 8000);
+
+    const matchedSkills = Array.isArray(mlAnalysis?.matchedSkills)
+        ? mlAnalysis.matchedSkills.join(", ")
+        : "None";
+
+    const missingSkills = Array.isArray(mlAnalysis?.missingSkills)
+        ? mlAnalysis.missingSkills
+        : [];
+
+    const missingSkillsText = missingSkills.length
+        ? missingSkills.join(", ")
+        : "None";
+
+    const prompt = `
 You are an expert technical interviewer and career coach.
 
-Analyze the candidate based on:
+Generate a personalized interview preparation report using the candidate's actual information.
 
-RESUME:
-${resume}
+CANDIDATE RESUME:
+${resumeForAI}
 
 SELF DESCRIPTION:
 ${selfDescription || "No self-description provided."}
@@ -49,83 +203,66 @@ ${selfDescription || "No self-description provided."}
 JOB DESCRIPTION:
 ${jobDescription}
 
-Generate a complete interview preparation report.
+ML ANALYSIS:
+Match Score: ${mlMatchScore}
+Match Level: ${mlAnalysis?.matchLevel ?? "Not available"}
+Matched Skills: ${matchedSkills}
+Missing Skills: ${missingSkillsText}
 
-IMPORTANT:
-You MUST follow the exact JSON structure provided by the schema.
+IMPORTANT MATCH SCORE RULE:
+The ML model has already calculated the match score.
+Return exactly ${mlMatchScore} as matchScore.
+Do not calculate or modify this score.
 
-1. matchScore
-Give an overall score from 0 to 100.
+TECHNICAL QUESTIONS:
+Generate exactly 3 relevant technical interview questions.
+Each question must have:
+- question
+- intention
+- answer
 
-2. technicalquestion
-Generate at least 8 technical questions.
+BEHAVIOURAL QUESTIONS:
+Generate exactly 2 relevant behavioural interview questions.
+Each question must have:
+- question
+- intention
+- answer
 
-Each item MUST be an object:
+For answers:
+- Explain the important points the candidate should cover.
+- Provide a useful answer structure or sample response.
+- Use the candidate's actual experience only.
+- Never invent internships, companies, clients, achievements, or projects.
+- If actual experience is unavailable, provide an answer framework the candidate can personalize.
+- Use plain text only.
+- Do not include Markdown, code fences, or code blocks.
+- Avoid unnecessary quotation marks.
 
-{
-  "question": "Question text",
-  "intention": "Why interviewer asks this",
-  "answer": "How the candidate should answer"
-}
+SKILL GAPS:
+Use only the ML model's missing skills.
+For every missing skill, provide:
+- skill
+- severity: low, medium, or high
 
-DO NOT return technical questions as strings.
+If there are no missing skills, return an empty array [].
+Do not invent missing skills.
 
-3. behaviouralquestion
-Generate at least 5 behavioural questions.
+PREPARATION PLAN:
+Generate exactly 7 preparation days.
+Use sequential numeric day values: 1, 2, 3, 4, 5, 6, 7.
+Each day must contain:
+- day: number
+- focus: string
+- tasks: array of at least 2 actionable strings
 
-Each item MUST be:
+The plan must address the job description, missing skills, and candidate's existing knowledge.
 
-{
-  "question": "Question text",
-  "intention": "Why interviewer asks this",
-  "answer": "How the candidate should answer"
-}
+JOB TITLE:
+Extract the most appropriate job title from the job description.
+Do not use a generic title if an actual title is available.
 
-DO NOT return behavioural questions as strings.
-
-4. skillGaps
-Compare the candidate's resume against the job description.
-
-Each skill gap MUST be an object:
-
-{
-  "skill": "TypeScript",
-  "severity": "medium"
-}
-
-severity MUST be one of:
-"low", "medium", "high"
-
-DO NOT return skillGaps as strings.
-
-5. preparationPlan
-Generate exactly 7 days.
-
-Each day MUST be an object:
-
-{
-  "day": 1,
-  "focus": "JavaScript fundamentals",
-  "tasks": [
-    "Revise closures",
-    "Practice promises",
-    "Solve 5 JavaScript problems"
-  ]
-}
-
-The tasks field MUST be an array of strings.
-
-DO NOT return preparationPlan as strings.
-
-6. title
-Extract the actual job title from the job description.
-
-For example:
-"Software Engineer"
-
-IMPORTANT:
-Use these EXACT field names:
-
+OUTPUT:
+Return exactly these six top-level fields:
 matchScore
 technicalquestion
 behaviouralquestion
@@ -133,45 +270,126 @@ skillGaps
 preparationPlan
 title
 
-Do NOT use:
-
-jobTitle
-technicalQuestions
-behavioralQuestions
-
-Do NOT return empty arrays.
-
-Return ONLY valid JSON matching the schema.
+Return only the structured JSON object.
+Do not add explanations outside the JSON.
 `;
 
-    
+    console.log("🔥 ABOUT TO CALL GROQ");
 
-        
-        const response = await ai.models.generateContent({
-        model:"gemini-3.6-flash",
-        contents:prompt,
-        config:{
-            responseMimeType:"application/json",
-            // responseJsonSchema:zodToJsonSchema(interviewReportSchema),
-            
+    try {
+
+        // ==========================================
+        // 4. GROQ API CALL WITH STRICT JSON SCHEMA
+        // ==========================================
+
+        const response = await groq.chat.completions.create({
+            model: "openai/gpt-oss-120b",
+
+            messages: [
+                {
+                    role: "system",
+                    content:
+                        "You are a professional technical interviewer. " +
+                        "Generate accurate, personalized interview reports. " +
+                        "Follow the supplied response schema exactly. " +
+                        "Never invent candidate experience."
+                },
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ],
+
+            response_format: {
+                type: "json_schema",
+                json_schema: {
+                    name: "interview_report",
+                    strict: true,
+                    schema: groqResponseSchema
+                }
+            },
+
+            temperature: 0.2
+        });
+
+        console.log("🔥 GROQ RESPONSE RECEIVED");
+
+        const content = response.choices?.[0]?.message?.content;
+
+        if (!content) {
+            throw new Error("Groq returned an empty response.");
         }
-         })
 
-    //    console.log("🔥 GEMINI RESPONSE OBJECT:");
-    //     console.log(response);
+        // ==========================================
+        // 5. PARSE JSON
+        // ==========================================
 
-       const interviewReport = JSON.parse(response.text);
+        const interviewReport = JSON.parse(content);
 
-        console.log("🔥🔥 ACTUAL GEMINI JSON 🔥🔥");
-        console.log(JSON.stringify(interviewReport, null, 2));
+        // Always preserve the ML-generated match score.
+        interviewReport.matchScore = mlMatchScore;
 
-        const validatedReport = interviewReportSchema.parse(interviewReport);
+        // ==========================================
+        // 6. ZOD VALIDATION
+        // ==========================================
+
+        const validationResult =
+            interviewReportSchema.safeParse(interviewReport);
+
+        if (!validationResult.success) {
+            console.error(
+                "❌ INTERVIEW REPORT VALIDATION FAILED:",
+                validationResult.error.flatten()
+            );
+
+            throw new Error(
+                "AI generated a report that did not meet the required format. Please try again."
+            );
+        }
+
+        const validatedReport = validationResult.data;
+
+        // ==========================================
+        // 7. FINAL REPORT
+        // ==========================================
+
+        console.log("✅ INTERVIEW REPORT VALIDATED SUCCESSFULLY");
+
+        console.log("Technical Questions:",
+            validatedReport.technicalquestion.length
+        );
+
+        console.log("Behavioural Questions:",
+            validatedReport.behaviouralquestion.length
+        );
+
+        console.log("Skill Gaps:",
+            validatedReport.skillGaps.length
+        );
+
+        console.log("Preparation Days:",
+            validatedReport.preparationPlan.length
+        );
 
         return validatedReport;
-      
-     
- }
 
-// 
+    } catch (error) {
 
- module.exports = generateInterviewReport
+        console.error("🔥 GROQ / AI SERVICE ERROR:");
+
+        if (error instanceof SyntaxError) {
+            console.error("Invalid JSON received from Groq.");
+        }
+
+        console.error(error);
+
+        throw error;
+    }
+}
+
+
+// ==========================================
+// 8. EXPORT
+// ==========================================
+
+module.exports = generateInterviewReport;

@@ -1,15 +1,19 @@
-import React, { useState  , useRef} from "react";
+import React, { useState  , useRef,useContext} from "react";
 import "../style/home.scss";
 import {useInterview} from "../hooks/useInterview.js" 
 import { Navigate, useNavigate } from "react-router";
+import { AuthContext } from "../../auth/auth.context.jsx";
 const Home = () => {
     const navigate = useNavigate()
+    const { logout, user } = useContext(AuthContext);
     const {loading , generateReport} = useInterview()
     const [jobDescription, setjobDescription] = useState("")
     const [selfDescription, setselfDescription] = useState("")
     const resumInputref = useRef()
     const [resume, setResume] = useState(null);
-     const [resumeError, setResumeError] = useState("");
+    const [resumeError, setResumeError] = useState("");
+
+    
 
   const handleResumeChange = (e) => {
     const file = e.target.files[0];
@@ -29,21 +33,64 @@ const Home = () => {
     setResume(file);
   };
 
-  const handleresumeReport= async () =>{
+  const handleLogout = async () => {
     try {
-      
-      const resumefile = resumInputref.current.files[0]
-      const data = await generateReport({jobDescription , selfDescription , resumefile})
-      if (!data || !data._id) {
-      console.error("generateReport did not return an _id", data);
-      return;
-    }
-      navigate(`/interview/${data._id}`)
+        await logout();
+
+        sessionStorage.removeItem("demoInterviewReport");
+
+        navigate("/login", { replace: true });
     } catch (error) {
-      console.error("Error generating report:", error);
-      
+        console.error("Logout failed:", error);
+        alert("Unable to logout. Please try again.");
     }
+};
+
+ const handleresumeReport = async () => {
+    try {
+        if (!jobDescription.trim() || !selfDescription.trim() || !resume) {
+            alert("Please fill all fields and upload your resume.");
+            return;
+        }
+
+        const data = await generateReport({
+            jobDescription,
+            selfDescription,
+            resumefile: resume
+        });
+
+        if (!data?.interviewReport) {
+            alert("Unable to generate interview report. Please try again.");
+            return;
+        }
+
+        // Daily limit reached: open demo report
+        if (data.isDemo) {
+            sessionStorage.setItem(
+                "demoInterviewReport",
+                JSON.stringify(data.interviewReport)
+            );
+
+            navigate("/interview/demo", { 
+                state: {
+                    report: data.interviewReport,
+                    demoMessage: data.message
+                }
+            });
+            return;
+        }
+
+        // Normal AI-generated report
+        navigate(`/interview/${data.interviewReport._id}`);
+
+    } catch (error) {
+        console.error("Error generating report:", error);
+        alert(
+            error.response?.data?.message ||
+            "Something went wrong. Please try again."
+        );
     }
+};
 
   if(loading){
     return (
@@ -250,6 +297,20 @@ const Home = () => {
         </div>
 
       </div>
+
+       <div className="home-topbar">
+            <span>
+                Welcome, {user?.username || "User"}
+            </span>
+
+            <button
+                type="button"
+                className="logout-button"
+                onClick={handleLogout}
+            >
+                Logout
+            </button>
+        </div>
     </main>
   );
 };

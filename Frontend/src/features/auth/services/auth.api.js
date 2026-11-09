@@ -29,18 +29,20 @@ export async function Login({ email, password }) {
 
         return response.data;
     } catch (error) {
-        console.error("Error during login:", error);
-        throw error;
-    }
+    console.error(
+        "Login failed:",
+        error.response?.data || error.message
+    );
+    throw error;
+}
 }
 
 
 export async function Logout() {
-    try{
-        const response = await api.get("/api/auth/logout");
+    try {
+        const response = await api.post("/api/auth/logout");
         return response.data;
-    }
-    catch (error) {
+    } catch (error) {
         console.error("Error during logout:", error);
         throw error;
     }
