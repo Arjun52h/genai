@@ -1,47 +1,133 @@
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
+
+import re
+import math
+from collections import Counter
 
 from skills import extract_skills
 
 
-# Load the pretrained NLP model
-model = SentenceTransformer("all-MiniLM-L6-v2")
+STOP_WORDS = {
+    "the", "a", "an", "and", "or", "is", "are", "was",
+    "were", "to", "of", "in", "on", "for", "with", "by",
+    "as", "at", "from", "this", "that", "it", "be", "will",
+    "have", "has", "had", "we", "you", "your", "our"
+}
+
+
+def tokenize(text):
+    words = re.findall(
+        r"[a-z0-9]+(?:[+#.][a-z0-9+#.]*)*",
+        str(text).lower()
+    )
+
+    words = [
+        word for word in words
+        if word not in STOP_WORDS
+    ]
+
+    # Include single words and consecutive two-word phrases.
+    bigrams = [
+        words[i] + " " + words[i + 1]
+        for i in range(len(words) - 1)
+    ]
+
+    return words + bigrams
+
+
+def calculate_similarity(text1, text2):
+
+    documents = [
+        tokenize(text1),
+        tokenize(text2)
+    ]
+
+    document_frequency = Counter()
+
+    for document in documents:
+        document_frequency.update(set(document))
+
+    total_documents = len(documents)
+    vectors = []
+
+    for document in documents:
+
+        counts = Counter(document)
+        total_terms = len(document)
+
+        vector = {}
+
+        if total_terms == 0:
+            vectors.append(vector)
+            continue
+
+        for term, count in counts.items():
+
+            tf = count / total_terms
+
+            idf = math.log(
+                (1 + total_documents) /
+                (1 + document_frequency[term])
+            ) + 1
+
+            vector[term] = tf * idf
+
+        vectors.append(vector)
+
+    vector1, vector2 = vectors
+
+    if not vector1 or not vector2:
+        return 0.0
+
+    common_terms = set(vector1) & set(vector2)
+
+    dot_product = sum(
+        vector1[term] * vector2[term]
+        for term in common_terms
+    )
+
+    magnitude1 = math.sqrt(
+        sum(value ** 2 for value in vector1.values())
+    )
+
+    magnitude2 = math.sqrt(
+        sum(value ** 2 for value in vector2.values())
+    )
+
+    if magnitude1 == 0 or magnitude2 == 0:
+        return 0.0
+
+    return dot_product / (magnitude1 * magnitude2)
 
 
 def analyze_resume_job(resume, job_description):
 
-    # Convert resume and job description into embeddings
-    resume_embedding = model.encode([resume])
-    job_embedding = model.encode([job_description])
+    similarity = calculate_similarity(
+        resume,
+        job_description
+    )
 
-    # Calculate semantic similarity
-    similarity = cosine_similarity(
-        resume_embedding,
-        job_embedding
-    )[0][0]
+    match_score = round(
+        max(0.0, min(1.0, similarity)) * 100,
+        2
+    )
 
-    # Convert similarity to percentage
-    match_score = round(float(similarity) * 100, 2)
-
-    # Extract skills
     resume_skills = set(extract_skills(resume))
     job_skills = set(extract_skills(job_description))
 
-    # Skills present in both
     matched_skills = sorted(
-        list(resume_skills.intersection(job_skills))
+        resume_skills.intersection(job_skills)
     )
 
-    # Skills required by JD but missing from resume
     missing_skills = sorted(
-        list(job_skills - resume_skills)
+        job_skills - resume_skills
     )
 
-    # Match category
     if match_score >= 80:
         match_level = "Strong Match"
+
     elif match_score >= 60:
         match_level = "Moderate Match"
+
     else:
         match_level = "Needs Improvement"
 
