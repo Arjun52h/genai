@@ -33,8 +33,15 @@ export const generateinterviewReport = async ({
         return response.data;
 
     }catch (error) {
-    console.log("STATUS:", error.response?.status);
-    console.log("BACKEND ERROR:", error.response?.data);
+     console.log("STATUS:", error.response?.status);
+
+    console.log(
+        "BACKEND RESPONSE:",
+        JSON.stringify(error.response?.data, null, 2)
+    );
+
+    console.log("ERROR MESSAGE:", error.message);
+
 
     if (
         error.response?.status === 429 &&

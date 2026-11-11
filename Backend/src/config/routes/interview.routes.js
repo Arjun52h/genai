@@ -10,8 +10,20 @@ const upload = require("../middlewares/file.middleware")
  * @description generate new interview report on the basis of user self description,resume pdf and job description 
  * @access private
  */
-interviewRouter.post("/",authMiddleware.authUser,upload.single("resume"),interviewcontroller.generateInterviewReportController) // forard request only if logged in user by middleware
-
+interviewRouter.post(
+    "/",
+    (req, res, next) => {
+        console.log("🔥 INTERVIEW ROUTE HIT");
+        next();
+    },
+    authMiddleware.authUser,
+    upload.single("resume"),
+    (req, res, next) => {
+        console.log("🔥 AUTH AND UPLOAD PASSED");
+        next();
+    },
+    interviewcontroller.generateInterviewReportController
+);
 
 /**
  * 

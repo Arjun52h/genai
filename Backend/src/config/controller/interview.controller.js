@@ -59,6 +59,7 @@ async function releaseDailyUsage(userId, today) {
 
 
 async function generateInterviewReportController(req, res) {
+     console.log("🔥 CONTROLLER STARTED");
     const userId = req.user.id || req.user._id;
     const today = getTodayDate();
     let usageReserved = false;
@@ -95,16 +96,59 @@ async function generateInterviewReportController(req, res) {
             new PDFParse(Uint8Array.from(req.file.buffer))
         ).getText();
 
-        // Run ML Resume-JD Analysis
-        const mlResponse = await axios.post(
-            "http://127.0.0.1:8001/analyze",
-            {
-                resume: resumeContent.text,
-                jobDescription
-            }
-        );
+        
 
-        const mlAnalysis = mlResponse.data;
+        console.log("ML URL:", JSON.stringify(process.env.ML_API_URL));
+
+console.log("HTTP_PROXY:", process.env.HTTP_PROXY);
+console.log("HTTPS_PROXY:", process.env.HTTPS_PROXY);
+console.log("ALL_PROXY:", process.env.ALL_PROXY);
+      
+// Run ML Resume-JD Analysis
+const mlApiUrl = process.env.ML_API_URL;
+
+if (!mlApiUrl) {
+    throw new Error("ML_API_URL is not configured");
+}
+
+console.log("Calling ML Service:", mlApiUrl);
+
+console.log("BACKEND PROCESS:", process.pid);
+console.log("ACTUAL ML URL:", mlApiUrl);
+console.log("REQUESTING RENDER ML SERVICE...");
+
+try {
+    const mlResponse = await axios.post(
+        mlApiUrl,
+        {
+            resume: resumeContent.text,
+            jobDescription
+        },
+        {
+            timeout: 60000,
+            proxy: false
+        }
+    );
+
+    console.log("ML RESPONSE STATUS:", mlResponse.status);
+
+    const mlAnalysis = mlResponse.data;
+
+} catch (err) {
+    console.error("ML REQUEST FAILED:", {
+        message: err.message,
+        url: err.config?.url,
+        hostname: err.hostname,
+        code: err.code
+    });
+
+    throw err;
+}
+
+const mlAnalysis = mlResponse.data;
+
+console.log("ML Analysis received:", mlAnalysis);
+
 
         // Generate report using Gemini
         const interviewReportbyai = await generateInterviewReport({
