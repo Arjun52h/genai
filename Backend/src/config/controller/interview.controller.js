@@ -105,6 +105,7 @@ console.log("HTTPS_PROXY:", process.env.HTTPS_PROXY);
 console.log("ALL_PROXY:", process.env.ALL_PROXY);
       
 // Run ML Resume-JD Analysis
+
 const mlApiUrl = process.env.ML_API_URL;
 
 if (!mlApiUrl) {
@@ -113,37 +114,19 @@ if (!mlApiUrl) {
 
 console.log("Calling ML Service:", mlApiUrl);
 
-console.log("BACKEND PROCESS:", process.pid);
-console.log("ACTUAL ML URL:", mlApiUrl);
-console.log("REQUESTING RENDER ML SERVICE...");
+const mlResponse = await axios.post(
+    mlApiUrl,
+    {
+        resume: resumeContent.text,
+        jobDescription
+    },
+    {
+        timeout: 60000,
+        proxy: false
+    }
+);
 
-try {
-    const mlResponse = await axios.post(
-        mlApiUrl,
-        {
-            resume: resumeContent.text,
-            jobDescription
-        },
-        {
-            timeout: 60000,
-            proxy: false
-        }
-    );
-
-    console.log("ML RESPONSE STATUS:", mlResponse.status);
-
-    const mlAnalysis = mlResponse.data;
-
-} catch (err) {
-    console.error("ML REQUEST FAILED:", {
-        message: err.message,
-        url: err.config?.url,
-        hostname: err.hostname,
-        code: err.code
-    });
-
-    throw err;
-}
+console.log("ML RESPONSE STATUS:", mlResponse.status);
 
 const mlAnalysis = mlResponse.data;
 
